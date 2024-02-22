@@ -32,7 +32,7 @@ const (
 )
 
 var baud int
-var readTimeoutSeconds int
+var readTimeoutMillieconds int
 var logsEnabled bool
 var guiMode string
 
@@ -322,7 +322,7 @@ func createGui() {
 	if !fullScreen {
 		mainGui.BaudParagraph.Text = fmt.Sprintf("Baud: %d", baud)
 		mainGui.DeviceParagraph.Text = fmt.Sprintf("Device: %s", portName)
-		mainGui.ReadTimeoutParagraph.Text = fmt.Sprintf("Read timeout [ms]: %d", readTimeoutSeconds)
+		mainGui.ReadTimeoutParagraph.Text = fmt.Sprintf("Read timeout [ms]: %d", readTimeoutMillieconds)
 		mainGui.LogsEnabledParagraph.Text = fmt.Sprintf("Logs enabled: %v", logsEnabled)
 	}
 	updateWrittenBytesParagraph()
@@ -369,7 +369,7 @@ func openSerial(portName string) {
 	var err error
 	serialMode := &serial.Mode{BaudRate: baud}
 	serialPort, err = serial.Open(portName, serialMode)
-	serialPort.SetReadTimeout(time.Duration(int32(readTimeoutSeconds)) * time.Microsecond)
+	serialPort.SetReadTimeout(time.Duration(int32(readTimeoutMillieconds)) * time.Millisecond)
 	utils.Must("open serial", err)
 	utils.Must("flush", serialPort.Drain())
 	utils.Must("reset input buffer", serialPort.ResetInputBuffer())
@@ -444,7 +444,7 @@ func readSerial() {
 
 func initFlags() {
 	flag.IntVar(&baud, "baud", 9600, "Baud value")
-	flag.IntVar(&readTimeoutSeconds, "read-timeout-ms", 10, "Read timeout in milliseconds")
+	flag.IntVar(&readTimeoutMillieconds, "read-timeout-ms", 10, "Read timeout in milliseconds")
 	flag.StringVar(&guiMode, "mode", "TEXT", "Mode for the gui")
 	flag.BoolVar(&logsEnabled, "logs", false, "Is logging enabled?")
 }
@@ -453,7 +453,7 @@ func validateFlags() {
 	if baud < 0 {
 		log.Fatalln("baud cannot be negative")
 	}
-	if readTimeoutSeconds < 0 {
+	if readTimeoutMillieconds < 0 {
 		log.Fatalln("read timeout seconds cannot be negative")
 	}
 	validMode := true
@@ -470,7 +470,7 @@ func validateFlags() {
 
 func logFlags() {
 	log.Printf("Baud rate: %d\n", baud)
-	log.Printf("Read timeout [ms]: %d\n", readTimeoutSeconds)
+	log.Printf("Read timeout [ms]: %d\n", readTimeoutMillieconds)
 	log.Printf("Gui mode: %s\n", guiMode)
 	log.Printf("Logs enabled: %v\n", logsEnabled)
 }
