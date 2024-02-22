@@ -85,13 +85,17 @@ func toHexLines(s string) []string {
 			end = len(hexString)
 		}
 		hexLine := hexString[start:end]
-		hexLines[i] = splitHexLine(hexLine)
+		hexLines[i] = splitHexLine(hexLine, i)
 	}
 	return hexLines[:]
 }
 
-func splitHexLine(hexLine string) string {
+func splitHexLine(hexLine string, lineNum int) string {
 	var builder strings.Builder
+	builder.WriteString(fmt.Sprintf("%04x", lineNum*8))
+	builder.WriteRune('-')
+	builder.WriteString(fmt.Sprintf("%04x", lineNum*8+7)) // end address points to last byte
+	builder.WriteString("  ")
 	for i, r := range hexLine {
 		if i != 0 && i%2 == 0 {
 			builder.WriteRune(' ')
